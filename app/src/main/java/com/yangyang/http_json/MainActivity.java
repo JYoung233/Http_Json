@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +23,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ListView mlist;
-    private static String Url="http://www.imooc.com/api/teacher?type=4& num=30";
+    private static String Url="http://10.151.235.88:8080/JsonProject2/JsonAction";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +41,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<NewsBean> newsBeans) {
+
             super.onPostExecute(newsBeans);
+            NewsAdapter adapter=new NewsAdapter(MainActivity.this,newsBeans);//直接由数据传递进来
+            mlist.setAdapter(adapter);
+
         }
 
         @Override
@@ -55,7 +63,22 @@ public class MainActivity extends AppCompatActivity {
         List<NewsBean> list=new ArrayList<>();
         try {
             String jsonstring=readStream(new URL(url).openStream());
-            Log.d("xys",jsonstring);
+            JSONObject jsonObject;
+            NewsBean bean;
+            try {
+                jsonObject=new JSONObject(jsonstring);
+                JSONArray jsonArray=new JSONArray("person");
+                for(int i=0;i<jsonArray.length();i++){
+                    jsonObject=jsonArray.getJSONObject(i);
+                    bean=new NewsBean();
+                    bean.setNewsiconurl("iconurl");//忘了
+                    bean.setNewscontent("content");
+                    bean.setNewstitle("title");
+                    list.add(bean);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
