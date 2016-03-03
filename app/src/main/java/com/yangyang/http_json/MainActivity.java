@@ -23,7 +23,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ListView mlist;
-    private static String Url="http://10.151.235.88:8080/JsonProject2/JsonAction";
+    private static String Url="http://10.151.208.83:8080/JsonProject2/JsonAction";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,16 +64,17 @@ public class MainActivity extends AppCompatActivity {
         try {
             String jsonstring=readStream(new URL(url).openStream());
             JSONObject jsonObject;
+            Log.d("xys",jsonstring);
             NewsBean bean;
             try {
                 jsonObject=new JSONObject(jsonstring);
-                JSONArray jsonArray=new JSONArray("person");
+                JSONArray jsonArray=jsonObject.getJSONArray("persons");//这里要注意
                 for(int i=0;i<jsonArray.length();i++){
                     jsonObject=jsonArray.getJSONObject(i);
                     bean=new NewsBean();
-                    bean.setNewsiconurl("iconurl");//忘了
-                    bean.setNewscontent("content");
-                    bean.setNewstitle("title");
+                    bean.setNewsiconurl(jsonObject.getString("iconUrl"));//这里重写一遍
+                    bean.setNewscontent(jsonObject.getString("content"));
+                    bean.setNewstitle(jsonObject.getString("title"));
                     list.add(bean);
                 }
             } catch (JSONException e) {
