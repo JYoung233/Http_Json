@@ -7,12 +7,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.LruCache;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -22,11 +25,15 @@ import java.net.URL;
 public class ImageLoader {
     private ImageView imageView;
     private String Url;
+    private ListView mlistview;
+    private Set<MyAsyncTask> mtask;
     LruCache<String,Bitmap> mCache;//创建cache
-
-    public ImageLoader() {
+    //构造函数
+    public ImageLoader(ListView listView) {
         int MaxMemory= (int) Runtime.getRuntime().maxMemory();
         int cachesize=MaxMemory/4;
+        mlistview=listView;
+        mtask=new HashSet<>();
         mCache=new LruCache<String,Bitmap>(cachesize){
             @Override
             protected int sizeOf(String key, Bitmap value) {
@@ -46,6 +53,29 @@ public class ImageLoader {
 
         return mCache.get(Url);
 
+    }
+    //加载指定
+    public void LoadImages(int start,int end){
+        for (int i = start; i <end; i++) {
+            String Url=NewsAdapter.Urls[i];//获得Url
+            Bitmap bitmap=getBitmapFromCache(Url);
+            if(bitmap==null){
+                MyAsyncTask task=new MyAsyncTask(Url);//因为现在是通过tag找到imageview，所以直接通过imageview设置就不合理
+                mtask.add(task);
+            }else{
+              ImageView imagview= (ImageView) mlistview.findViewWithTag(Url);
+                imagview.setImageBitmap(bitmap);
+
+            }
+        }
+
+    }
+    public void CancelAllTask(){
+        if(mtask!=null){
+            for (MyAsyncTask task:mtask) {
+                task.cancel(false);
+            }
+        }
     }
 
 
@@ -76,17 +106,24 @@ public class ImageLoader {
             }.start();
 
     }
+    //不通过这里触发。
     public void ShowImageByAsyncask(ImageView imageView,String Url){
-            MyAsyncTask task=new MyAsyncTask(imageView,Url);
-            task.execute(Url);
+            Bitmap bitmap=getBitmapFromCache(Url);
+        if(bitmap==null){
+            imageView.setImageResource(R.mipmap.ic_launcher);
+
+        }
+        else{
+            imageView.setImageBitmap(bitmap);
+        }
 
     }
     private class MyAsyncTask extends AsyncTask<String,Void,Bitmap>{
-        private ImageView im;
+        //private ImageView im;
         private String url;
-        public MyAsyncTask(ImageView imageView1,String Url) {
+        public MyAsyncTask(String Url) {
             super();
-            im=imageView1;
+            //im=imageView1;
             url=Url;
         }
 
@@ -100,9 +137,11 @@ public class ImageLoader {
               if(getBitmapFromCache(url)==null){
                   addBitmapToCache(url,bitmap);
               }
-              if(bitmap!=null&&im.getTag().equals(url)){
+             ImageView im= (ImageView) mlistview.findViewWithTag(Url);
+              if(bitmap!=null&&im!=null&&im.getTag().equals(url)){
                   im.setImageBitmap(bitmap);
               }
+            mtask.remove(this);
         }
 
         @Override
