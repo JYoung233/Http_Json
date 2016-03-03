@@ -16,6 +16,7 @@ import java.util.List;
 public class NewsAdapter extends BaseAdapter {
     private List<NewsBean> mlist;
     private LayoutInflater mlayoutInflater;
+    private ImageLoader imageLoader=new ImageLoader();//保证不出现多个cache
 
     public NewsAdapter(Context context, List<NewsBean> data) {
         mlist = data;
@@ -54,7 +55,7 @@ public class NewsAdapter extends BaseAdapter {
            }
          viewHolder.im.setImageResource(R.mipmap.ic_launcher);
          viewHolder.im.setTag(mlist.get(position).getNewsiconurl());//item图片出现错乱的原因是，list正确的item没有对应正确的url
-         new ImageLoader().ImageLoadThread(viewHolder.im,mlist.get(position).getNewsiconurl());
+        imageLoader.ShowImageByAsyncask(viewHolder.im,mlist.get(position).getNewsiconurl());
          viewHolder.content.setText(mlist.get(position).getNewscontent());
          viewHolder.title.setText(mlist.get(position).getNewstitle());
            return convertView;
