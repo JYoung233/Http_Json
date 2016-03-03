@@ -18,21 +18,25 @@ import java.net.URL;
  */
 public class ImageLoader {
     private ImageView imageView;
+    private String Url;
     private Handler mHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            imageView.setImageBitmap((Bitmap) msg.obj);
+            if(imageView.getTag().equals(Url)) {
+                imageView.setImageBitmap((Bitmap) msg.obj);//不可以在子线程中直接修改UI，单线程模型，创建handler
+            }
         }
     };
     public void ImageLoadThread(ImageView im,final String IconUrl){
+        Url=IconUrl;
         imageView=im;
         new Thread(){
             @Override
             public void run() {
                 super.run();
                 Bitmap bitmap=BitmapFromUrl(IconUrl);
-                Message msg=Message.obtain();
+                Message msg=Message.obtain();//使用现有的回收message,提高使用效率
                 msg.obj=bitmap;
                 mHandler.sendMessage(msg);
 
