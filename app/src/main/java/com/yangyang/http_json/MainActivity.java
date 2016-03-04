@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<NewsBean> newsBeans) {
 
             super.onPostExecute(newsBeans);
-            NewsAdapter adapter=new NewsAdapter(MainActivity.this,newsBeans);//直接由数据传递进来
+            NewsAdapter adapter=new NewsAdapter(MainActivity.this,newsBeans,mlist);//直接由数据传递进来
             mlist.setAdapter(adapter);
 
         }
