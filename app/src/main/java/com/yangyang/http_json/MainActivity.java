@@ -1,8 +1,8 @@
 package com.yangyang.http_json;
 
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 
@@ -10,7 +10,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mlist= (ListView) findViewById(R.id.list1);
+
         new MyAsyncTask().execute(Url);
 
     }
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
             super.onPostExecute(newsBeans);
             NewsAdapter adapter=new NewsAdapter(MainActivity.this,newsBeans,mlist);//直接由数据传递进来
+
             mlist.setAdapter(adapter);
 
         }

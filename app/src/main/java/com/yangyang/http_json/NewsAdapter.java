@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Created by asus on 2016/3/2.
+ *
  */
 public class NewsAdapter extends BaseAdapter implements AbsListView.OnScrollListener{
     private List<NewsBean> mlist;
@@ -65,9 +66,9 @@ public class NewsAdapter extends BaseAdapter implements AbsListView.OnScrollList
         else{
                viewHolder= (ViewHolder) convertView.getTag();
            }
-         viewHolder.im.setImageResource(R.mipmap.ic_launcher);
+          viewHolder.im.setImageResource(R.mipmap.ic_launcher);
          viewHolder.im.setTag(mlist.get(position).getNewsiconurl());//item图片出现错乱的原因是，list正确的item没有对应正确的url
-        imageLoader.ShowImageByAsyncask(viewHolder.im,mlist.get(position).getNewsiconurl());
+          imageLoader.ShowImageByAsyncask(viewHolder.im, mlist.get(position).getNewsiconurl());
          viewHolder.content.setText(mlist.get(position).getNewscontent());
          viewHolder.title.setText(mlist.get(position).getNewstitle());
            return convertView;
@@ -77,10 +78,11 @@ public class NewsAdapter extends BaseAdapter implements AbsListView.OnScrollList
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if(scrollState==SCROLL_STATE_IDLE){
             //没有滚动项，开始加载
-            imageLoader.LoadImages(mStart,mEnd);//没有进行预加载
+           // imageLoader.LoadImages(mStart,mEnd);//没有进行预加载
         }else{
             //停止加载
-            imageLoader.CancelAllTask();
+            //imageLoader.CancelAllTask();
+
         }
 
     }
@@ -96,10 +98,12 @@ public class NewsAdapter extends BaseAdapter implements AbsListView.OnScrollList
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         mStart=firstVisibleItem;
         mEnd=firstVisibleItem+visibleItemCount;
+        /*
         if(mFirst&&visibleItemCount>0){//当前列表第一次启动而且item已经绘出
             imageLoader.LoadImages(mStart,mEnd);
             mFirst=false;
         }
+        */
 
     }
 

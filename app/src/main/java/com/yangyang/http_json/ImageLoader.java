@@ -3,8 +3,6 @@ package com.yangyang.http_json;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.util.LruCache;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -33,7 +31,7 @@ public class ImageLoader {
         int MaxMemory= (int) Runtime.getRuntime().maxMemory();
         int cachesize=MaxMemory/4;
         mlistview=listView;
-        mtask=new HashSet<>();
+        mtask=new HashSet<>();//记录正在执行的线程，为了保证在滚动过程中停止所有的加载任务。
         mCache=new LruCache<String,Bitmap>(cachesize){
             @Override
             protected int sizeOf(String key, Bitmap value) {
@@ -60,13 +58,13 @@ public class ImageLoader {
             String Url=NewsAdapter.Urls[i];//获得Url
             Bitmap bitmap=getBitmapFromCache(Url);
             if(bitmap==null){
-                MyAsyncTask task=new MyAsyncTask(Url);//因为现在是通过tag找到imageview，所以直接通过imageview设置就不合理
-                mtask.add(task);
+              //  MyAsyncTask task=new MyAsyncTask(Url);//因为现在是通过tag找到imageview，所以直接通过imageview设置就不合理
+                //mtask.add(task);
             }else{
-              ImageView imagview= (ImageView) mlistview.findViewWithTag(Url);
-                imagview.setImageBitmap(bitmap);
+             ImageView imageview= (ImageView) mlistview.findViewWithTag(Url);//通过URL获得imagevie
+             imageview.setImageBitmap(bitmap);
 
-            }
+          }
         }
 
     }
@@ -78,7 +76,7 @@ public class ImageLoader {
         }
     }
 
-
+   /*使用子线程加载图片，handler接收消息并更新UI线程
     private Handler mHandler=new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -106,11 +104,12 @@ public class ImageLoader {
             }.start();
 
     }
+    */
     //不通过这里触发。
     public void ShowImageByAsyncask(ImageView imageView,String Url){
             Bitmap bitmap=getBitmapFromCache(Url);
         if(bitmap==null){
-            imageView.setImageResource(R.mipmap.ic_launcher);
+           new MyAsyncTask(imageView,Url).execute(Url);
 
         }
         else{
@@ -119,11 +118,11 @@ public class ImageLoader {
 
     }
     private class MyAsyncTask extends AsyncTask<String,Void,Bitmap>{
-        //private ImageView im;
+        private ImageView im;
         private String url;
-        public MyAsyncTask(String Url) {
+        public MyAsyncTask(ImageView imageView1,String Url) {
             super();
-            //im=imageView1;
+            im=imageView1;
             url=Url;
         }
 
@@ -134,14 +133,13 @@ public class ImageLoader {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-              if(getBitmapFromCache(url)==null){
+             addBitmapToCache(url,bitmap);
+             //ImageView im= (ImageView) mlistview.findViewWithTag(url);
+              if(bitmap!=null&&im.getTag().equals(url)){
+                  im.setImageBitmap(bitmap);
                   addBitmapToCache(url,bitmap);
               }
-             ImageView im= (ImageView) mlistview.findViewWithTag(Url);
-              if(bitmap!=null&&im!=null&&im.getTag().equals(url)){
-                  im.setImageBitmap(bitmap);
-              }
-            mtask.remove(this);
+            //mtask.remove(this);
         }
 
         @Override
