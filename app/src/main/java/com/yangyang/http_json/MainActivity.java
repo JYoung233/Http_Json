@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ListView mlist;
-    private static String Url="http://10.151.208.83:8080/JsonProject2/JsonAction";
+    private static String Url="http://1.yangjsonproject2.applinzi.com/JsonAction";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mlist= (ListView) findViewById(R.id.list1);
 
-        new MyAsyncTask().execute(Url);
+        new MyAsyncTask().execute("http://1.yangjsonproject2.applinzi.com/JsonAction");
 
     }
     class MyAsyncTask extends AsyncTask<String,Void,List<NewsBean>>{
@@ -108,5 +108,26 @@ public class MainActivity extends AppCompatActivity {
         return result;
 
     }
+    private String readStream1(InputStream is){
 
+        String result="";
+        try {
+            String line="";
+
+            BufferedReader br=new BufferedReader(new InputStreamReader(is,"gbk"));
+            try {
+                while((line=br.readLine())!=null){
+                    result+=line;
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+
+    }
 }
